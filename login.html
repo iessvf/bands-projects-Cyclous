@@ -1,27 +1,68 @@
 <!DOCTYPE html>
-<html>
-
+<!-- Created By CodingNepal -->
+<html lang="en" dir="ltr">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Untitled</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
-    <link rel="stylesheet" href="CSS/estiloLogin.css">
+   <meta charset="utf-8">
+   <title>Transparent Login Form HTML CSS</title>
+   <link rel="stylesheet" href="CSS/estiloLogin.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 
-<body>
-    <div class="login-dark">
-        <form method="post">
-            <h2 class="sr-only">Login Form</h2>
-            <div class="illustration"><i class="icon ion-ios-locked-outline"></i></div>
-            <div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email"></div>
-            <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password"></div>
-            <div class="form-group"><button class="btn btn-primary btn-block" type="submit">Log In</button></div><a href="#" class="forgot">Forgot your email or password?</a></form>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+
+
+<div class="bg-img">
+   <div class="content">
+
+      <header>Inici de sessió</header>
+      <form action="#">
+         <div class="field">
+
+
+            <span class="fa fa-user"></span>
+            <input type="text" required placeholder="Email or Phone">
+         </div>
+         <div class="field space">
+            <span class="fa fa-lock"></span>
+            <input type="password" class="pass-key" required placeholder="Password">
+            <span class="show">SHOW</span>
+         </div>
+         <div class="pass">
+            <a href="#">Forgot Password?</a>
+         </div>
+         <div class="field">
+            <input type="submit" value="LOGIN">
+         </div>
+      </form>
+
+
+      <div class="signup">
+         Don't have account?
+         <a href="#">Signup Now</a>
+
+      </div>
+
+      <footer>
+
+         <div class="logo"> <img src="IMG/logo-banda-perello.png" alt=""></div>
+      </footer>
+   </div>
+</div>
+<script>
+   const pass_field = document.querySelector('.pass-key');
+   const showBtn = document.querySelector('.show');
+   showBtn.addEventListener('click', function () {
+      if (pass_field.type === "password") {
+         pass_field.type = "text";
+         showBtn.textContent = "HIDE";
+         showBtn.style.color = "#3498db";
+      } else {
+         pass_field.type = "password";
+         showBtn.textContent = "SHOW";
+         showBtn.style.color = "#222";
+      }
+   });
+</script>
 </body>
 
 </html>
