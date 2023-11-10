@@ -28,17 +28,18 @@ if (isset($_POST["login"])) {
             // Consulta preparada para evitar inyección SQL
             $statement = $dbconn->prepare("SELECT * FROM bands WHERE username = :username");
             $statement->bindParam(':username', $username);
-
             $statement->execute();
 
             // Comprobar si se encontró un usuario
             if ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
                 // Usuario encontrado, ahora verifica la contraseña
                 if ($row['password'] === $password) {
-                    // Las credenciales son correctas, redirige a main_webpage.php
 
-                    // Crear la sesión con el nombre de usuario
+                    $id = $row['id'];
+
+                    // Crear la sesión con el nombre de usuario e ID
                     $_SESSION['username'] = $username;
+                    $_SESSION['id'] = $id;
 
                     header("Location: main_webpage.php");
                     exit();

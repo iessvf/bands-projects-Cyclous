@@ -1,0 +1,102 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+header {
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+nav {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.nav-links div {
+    display: inline;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: yellow;
+    /* Cambia el color al pasar el ratón sobre el enlace */
+}
+
+.menu-links {
+    display: flex;
+    gap: 20px;
+    justify-content: flex-end;
+    /* Coloca los elementos al final a la derecha */
+}
+
+aside {
+    background-color: #fff;
+    width: 20%;
+    padding: 20px;
+    position: fixed;
+}
+
+aside h2 {
+    font-size: 1.5em;
+    color: #333;
+}
+
+aside ul {
+    list-style: none;
+    padding: 0;
+}
+
+aside ul li {
+    margin-bottom: 10px;
+}
+
+aside ul li a {
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+}
+
+aside ul li a:hover {
+    color: #007bff;
+}
+
+main {
+    background-color: #fff;
+    margin-left: 22%;
+    padding: 20px;
+}
+
+footer {
+    background-color: #222;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+}
