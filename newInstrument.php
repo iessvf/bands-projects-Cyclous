@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <h2>Registro de Instrumento</h2>
-        <form action="" method="post">
+        <form action="" method="post" enctype="multipart/form-data">
             <input type="text" class="form-control" name="family" placeholder="Familia" required>
             <input type="text" class="form-control" name="type" placeholder="Tipo" required>
             <input type="text" class="form-control" name="brand" placeholder="Marca" required>
@@ -22,11 +22,93 @@
             <input type="date" class="form-control" name="acquisition_date" placeholder="Fecha de adquisición" required>
             <input type="text" class="form-control" name="state" placeholder="Estado" required>
             <textarea class="form-control" name="comment" placeholder="Comentario"></textarea>
-            <input type="file" class="form-control btn-upload" name="image" accept="image/*">
-            <button type="submit" class="btn">Registrar Instrumento</button>
+            <input type="file" class="form-control btn-upload" name="image" accept=".jpg, .jpeg, .png">
+            <button type="submit" class="btn" name="register_newInstrument">Registrar Instrumento</button>
             <a href="main_webpage.php">Volver al inicio</a>
         </form>
     </div>
 </body>
 
 </html>
+
+<?php
+
+session_start();
+
+if (isset($_SESSION['id'])) {
+    $id = $_SESSION['id'];
+    echo "esta es la id =" . $id;
+}
+if (isset($_POST["register_newInstrument"])) {
+
+    var_dump($_FILES);
+
+    if (!empty($_POST["family"]) && !empty($_POST["type"]) && !empty($_POST["brand"]) && !empty($_POST["model"]) && !empty($_POST["serial_number"]) && !empty($_POST["acquisition_date"]) && !empty($_POST["state"]) && !empty($_POST["comment"]) && !empty($_FILES["image"]["tmp_name"])) {
+
+
+        $family = $_POST["family"];
+        echo $family;
+        $type = $_POST["type"];
+        echo $type;
+        $brand = $_POST["brand"];
+        echo $brand;
+        $model = $_POST["model"];
+        echo $model;
+        $serial_number = $_POST["serial_number"];
+        echo $serial_number;
+        $acquisition_date = $_POST["acquisition_date"];
+        echo $acquisition_date;
+        $state = $_POST["state"];
+        echo $state;
+        $comment = $_POST["comment"];
+        echo $comment;
+
+
+        //Imagen
+        $img_name = $_FILES['image']['name'];
+        move_uploaded_file($_FILES['image']['tmp_name'], "./uploads/instruments/{$img_name}");
+        $image = "/uploads/instruments/{$img_name}";
+        echo $image;
+
+
+        $user = 'root';
+        $dbpassword = '';
+        $dsn = 'mysql:dbname=bands;host=localhost';
+
+        try {
+
+            $dbconn = new PDO($dsn, $user, $dbpassword);
+
+            // Inserción preparada 
+            $statement = $dbconn->prepare("INSERT INTO instruments (family,type,brand,model,serial_number,acquisition_date,state,comment,image,band_id) 
+                                    VALUES (:family, :type,:brand ,:model, :serial_number, :acquisition_date,:state,:comment,:image,:id)");
+
+            $statement->bindParam(':family', $family);
+            $statement->bindParam(':type', $type);
+            $statement->bindParam(':brand', $brand);
+            $statement->bindParam(':model', $model);
+            $statement->bindParam(':serial_number', $serial_number);
+            $statement->bindParam(':acquisition_date', $acquisition_date);
+            $statement->bindParam(':state', $state);
+            $statement->bindParam(':comment', $comment);
+            $statement->bindParam(':image', $image);
+            $statement->bindParam(':id', $id);
+            $statement->execute();
+
+        } catch (PDOException $e) {
+
+            $mensajeError = $e->getMessage();
+            echo "Error: " . $mensajeError;
+        }
+
+
+    }
+
+}
+
+
+
+
+
+
+?>

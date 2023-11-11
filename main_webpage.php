@@ -14,13 +14,14 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
         $dbconn = new PDO($dsn, $user, $dbpassword);
 
         // Consulta preparada para evitar inyección SQL
-        $statement = $dbconn->prepare("SELECT image FROM instruments WHERE band_id = :band_id");
+        $statement = $dbconn->prepare("SELECT * FROM instruments WHERE band_id = :band_id");
 
         $statement->bindParam(':band_id', $band_id);
         $statement->execute();
 
         // Obtener todas las filas como un array asociativo
-        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $array = $statement->fetchAll(PDO::FETCH_ASSOC);
+
 
     } catch (PDOException $e) {
         $error_message = "Error de conexión a la base de datos: " . $e->getMessage();
@@ -65,9 +66,7 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
             background-color: #fff;
         }
 
-        .instrument:hover {
-            transform: scale(1.05);
-        }
+
 
         .instrument img {
             max-width: 100%;
@@ -78,9 +77,31 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
         .instrument-info {
             padding: 10px;
             text-align: left;
-            /* Alinea el texto a la izquierda */
             margin-top: 10px;
-            /* Ajusta el espacio entre la imagen y la información */
+
+        }
+
+
+
+        .showMore {
+            background-color: #f0f0f0;
+            color: #333;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .showMore:hover {
+            background-color: #333;
+            color: #f0f0f0;
+
+        }
+
+        .showMore {
+            margin: auto;
+            /* Centra el botón horizontalmente */
+            display: block;
+            /* Hace que el botón ocupe todo el ancho disponible */
         }
     </style>
 </head>
@@ -126,20 +147,27 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
     <main>
         <div class="container">
             <?php
-            foreach ($result as $key => $image) {
-                echo '<div class="instrument">';
-                echo '<img src="' . $image['image'] . '" alt="Instrument Image">';
-                echo '<div class="instrument-info">';
-                echo '<p><strong>Familia:</strong> Guitarra</p>';
-                echo '<p><strong>Tipo:</strong> Acústica</p>';
-                echo '<p><strong>Marca:</strong> Fender</p>';
-                echo '<p><strong>Modelo:</strong> Stratocaster</p>';
-                echo '<p><strong>Número de Serie:</strong> 123456789</p>';
-                echo '<p><strong>Día de Adquisición:</strong> 2023-11-10</p>';
-                echo '<p><strong>Estado:</strong> Nuevo</p>';
-                echo '<p><strong>Comentario:</strong> Una descripción del instrumento.</p>';
-                echo '</div>';
-                echo '</div>';
+            foreach ($array as $row) {
+
+                ?>
+                <div class="instrument">
+
+
+                    <h3>
+                        <?php echo $row["brand"]; ?>
+                        <?php echo $row["model"]; ?>
+                    </h3>
+                    <img src='.<?php echo $row["image"]; ?>'>
+                    <form action="POST">
+                        <button class="showMore" type="sumbit">+info</button>
+                    </form>
+                </div>
+
+
+                <?php
+
+
+
             }
             ?>
         </div>
