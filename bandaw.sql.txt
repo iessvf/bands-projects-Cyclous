@@ -1,0 +1,212 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.0
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: localhost
+-- Tiempo de generación: 13-10-2023 a las 19:10:26
+-- Versión del servidor: 10.4.24-MariaDB
+-- Versión de PHP: 8.1.6
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `bandaw`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `bands`
+--
+
+CREATE TABLE `bands` (
+  `id` int(11) NOT NULL,
+  `username` varchar(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `mail` varchar(30) NOT NULL,
+  `logo` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `bands`
+--
+
+INSERT INTO `bands` (`id`, `username`, `password`, `name`, `mail`, `logo`) VALUES
+(1, 'perello', 'perellopass', 'Agrupació Musical El Perelló', 'agruppere@banda.com', '/uploads/bands/perello.png'),
+(2, 'algemesi', 'algemesipass', 'Societat Musical d\'Algemesí', 'socmusalg@band.com', '/uploads/bands/algemesi.png');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `instruments`
+--
+
+CREATE TABLE `instruments` (
+  `id` int(11) NOT NULL,
+  `family` varchar(50) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `brand` varchar(30) NOT NULL,
+  `model` varchar(30) NOT NULL,
+  `serial_number` varchar(50) DEFAULT NULL,
+  `acquisition_date` date DEFAULT NULL,
+  `state` varchar(50) NOT NULL,
+  `comment` text DEFAULT NULL,
+  `image` varchar(50) DEFAULT NULL,
+  `band_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `instruments`
+--
+
+INSERT INTO `instruments` (`id`, `family`, `type`, `brand`, `model`, `serial_number`, `acquisition_date`, `state`, `comment`, `image`, `band_id`) VALUES
+(1, 'Brass', 'Trombone', 'Yamaha', 'YSL 354', '10941248912', '2019-07-30', 'lent', 'Does not have the case.', '/uploads/instruments/10941248912.png', 1),
+(2, 'Brass', 'Trumpet', 'Yamaha', 'TML-322', '812u451239u', '2018-02-22', 'available', NULL, '/uploads/instruments/812u451239u.png', 1),
+(3, 'Wood', 'Saxophone', 'Serlmer', 'Axos ', 'se190123', '2022-12-15', 'available', 'Lend only to adults', '/uploads/instruments/se190123.png', 1),
+(4, 'Brass', 'Trombone', 'King', '2102', 'ki210212412', '2018-08-01', 'lent', 'Perfect for advanced studies', '/uploads/instruments/ki210212412.png', 1),
+(5, 'Wood', 'Clarinet', 'Startone', 'SCL 65', 'st129i41', '2022-03-13', 'available', 'Perfect for beginners', '/uploads/instruments/st129i41.png', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `loans`
+--
+
+CREATE TABLE `loans` (
+  `id` int(11) NOT NULL,
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `observations` text DEFAULT NULL,
+  `musician_name` varchar(100) NOT NULL,
+  `instrument_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `loans`
+--
+
+INSERT INTO `loans` (`id`, `start_date`, `end_date`, `observations`, `musician_name`, `instrument_id`) VALUES
+(1, '2022-12-27', '2023-06-12', 'Lent until the end of the course', 'Carlos Castelló', 3),
+(2, '2022-11-29', NULL, NULL, 'Vicent Villegas', 1),
+(3, '2023-09-03', NULL, 'Only for 23-24 course', 'Carla Marín', 4),
+(12, '2023-04-02', '2023-06-29', 'Until the end of the course', 'Vicen Martínez', 5);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `revisions`
+--
+
+CREATE TABLE `revisions` (
+  `id` int(11) NOT NULL,
+  `revision_date` date NOT NULL,
+  `company` varchar(50) NOT NULL,
+  `observations` text NOT NULL,
+  `price` float NOT NULL,
+  `receipt` varchar(50) NOT NULL,
+  `instrument_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `revisions`
+--
+
+INSERT INTO `revisions` (`id`, `revision_date`, `company`, `observations`, `price`, `receipt`, `instrument_id`) VALUES
+(1, '2023-10-08', 'Brass Repair', 'Repair hit on the chine', 60, '/uploads/docs/rev_1.pdf', 2),
+(2, '2023-02-21', 'Repair Music Store', 'Tuning and minor fixes', 45.76, '/uploads/docs/rev_2.pdf', 3),
+(3, '2023-10-03', 'Sanganxa', 'Fine tunning', 30, '/uploads/docs/rev_3.pdf', 5);
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `bands`
+--
+ALTER TABLE `bands`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `instruments`
+--
+ALTER TABLE `instruments`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_band_id` (`band_id`) USING BTREE;
+
+--
+-- Indices de la tabla `loans`
+--
+ALTER TABLE `loans`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_instrument_id` (`instrument_id`) USING BTREE;
+
+--
+-- Indices de la tabla `revisions`
+--
+ALTER TABLE `revisions`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_instrument_id` (`instrument_id`) USING BTREE;
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `bands`
+--
+ALTER TABLE `bands`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `instruments`
+--
+ALTER TABLE `instruments`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `loans`
+--
+ALTER TABLE `loans`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+
+--
+-- AUTO_INCREMENT de la tabla `revisions`
+--
+ALTER TABLE `revisions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `instruments`
+--
+ALTER TABLE `instruments`
+  ADD CONSTRAINT `instruments_ibfk_1` FOREIGN KEY (`band_id`) REFERENCES `bands` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `loans`
+--
+ALTER TABLE `loans`
+  ADD CONSTRAINT `loans_ibfk_1` FOREIGN KEY (`instrument_id`) REFERENCES `instruments` (`id`) ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `revisions`
+--
+ALTER TABLE `revisions`
+  ADD CONSTRAINT `revisions_ibfk_1` FOREIGN KEY (`instrument_id`) REFERENCES `instruments` (`id`) ON UPDATE CASCADE;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
