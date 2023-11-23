@@ -10,18 +10,93 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
     $user = 'root';
     $dbpassword = '';
     $dsn = 'mysql:dbname=bands;host=localhost';
+    $array = array();
+
     try {
         $dbconn = new PDO($dsn, $user, $dbpassword);
 
-        // Consulta preparada para evitar inyección SQL
-        $statement = $dbconn->prepare("SELECT * FROM instruments WHERE band_id = :band_id");
+        // Construir la consulta base
+        $query = "SELECT * FROM instruments WHERE band_id = :band_id ";
 
+        // Inicializar los valores de estado
+        $available = null;
+        $lent = null;
+
+        // Verificar si se ha enviado un formulario de búsqueda
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search_by'])) {
+            $family = isset($_POST['family']) ? $_POST['family'] : null;
+            $brand = isset($_POST['brand']) ? $_POST['brand'] : null;
+            $model = isset($_POST['model']) ? $_POST['model'] : null;
+            $serial_number = isset($_POST['serial_number']) ? $_POST['serial_number'] : null;
+
+            // Estado por defecto es null
+            $available = null;
+            $lent = null;
+
+            // Verificar si se seleccionó el estado
+            if (isset($_POST['status']) && is_array($_POST['status'])) {
+                foreach ($_POST['status'] as $status) {
+                    if ($status === 'available') {
+                        $available = 1;
+                    } elseif ($status === 'lent') {
+                        $lent = 1;
+                    }
+                }
+            }
+
+            // Agregar condiciones a la consulta si se seleccionó algún filtro
+            if (!empty($family)) {
+                $query .= " AND family = :family";
+            }
+
+            if (!empty($brand)) {
+                $query .= " AND brand = :brand";
+            }
+
+            if (!empty($model)) {
+                $query .= " AND model = :model";
+            }
+
+            if (!empty($serial_number)) {
+                $query .= " AND serial_number = :serial_number";
+            }
+
+            // Agregar condiciones de estado si se seleccionó algún estado
+            if (!is_null($available) || !is_null($lent)) {
+                $query .= " AND (state = :available OR state = :lent)";
+            }
+        }
+
+        $statement = $dbconn->prepare($query);
+
+        // Bindear parámetros
         $statement->bindParam(':band_id', $band_id);
+
+        if (!empty($family)) {
+            $statement->bindParam(':family', $family);
+        }
+
+        if (!empty($brand)) {
+            $statement->bindParam(':brand', $brand);
+        }
+
+        if (!empty($model)) {
+            $statement->bindParam(':model', $model);
+        }
+
+        if (!empty($serial_number)) {
+            $statement->bindParam(':serial_number', $serial_number);
+        }
+
+        if (!is_null($available) || !is_null($lent)) {
+            $statement->bindParam(':available', $available);
+            $statement->bindParam(':lent', $lent);
+        }
+
         $statement->execute();
 
         // Obtener todas las filas como un array asociativo
         $array = $statement->fetchAll(PDO::FETCH_ASSOC);
-
 
     } catch (PDOException $e) {
         $error_message = "Error de conexión a la base de datos: " . $e->getMessage();
@@ -41,143 +116,109 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tienda de Instrumentos</title>
     <link rel="stylesheet" href="./CSS/main_webpage.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
-        }
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: space-between;
-            margin: 20px;
-        }
-
-        .instrument {
-            width: calc(33.33% - 20px);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            background-color: #fff;
-        }
-
-
-
-        .instrument img {
-            max-width: 100%;
-            height: auto;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .instrument-info {
-            padding: 10px;
-            text-align: left;
-            margin-top: 10px;
-
-        }
-
-
-
-        .showMore {
-            background-color: #f0f0f0;
-            color: #333;
-            padding: 10px 20px;
-            border: 1px solid #ccc;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .showMore:hover {
-            background-color: #333;
-            color: #f0f0f0;
-
-        }
-
-        .showMore {
-            margin: auto;
-            /* Centra el botón horizontalmente */
-            display: block;
-            /* Hace que el botón ocupe todo el ancho disponible */
-        }
-    </style>
 </head>
 
 <body>
     <header>
-        <h1>Tienda de Instrumentos</h1>
-        <h3>Bienvenido,
+        <h1>
             <?php echo $username; ?>
-        </h3>
+        </h1>
+
+
+
     </header>
 
     <nav>
         <div class="nav-links">
-            <div><a href="#">Inicio</a></div>
-            <div><a href="#">Contacto</a></div>
-            <div><a href="#">Buscar</a></div>
+            <div><a href="main_webpage.php">Home</a></div>
+            <div><a href="newInstrument.php">New instrument</a></div>
+            <div><a href="#">Help</a></div>
         </div>
         <div class="menu-links">
-            <a href="logout.php">Cerrar sesión</a>
-            <a href="newInstrument.php">Dar de alta instrumento</a>
+            <a href="logout.php">Close session</a>
         </div>
     </nav>
 
     <aside>
-        <h2>Filtro Lateral</h2>
-        <ul>
-            <li><a href="#">Guitarras</a></li>
-            <li><a href="#">Pianos</a></li>
-            <li><a href="#">Baterías</a></li>
-            <li><a href="#">Amplificadores</a></li>
-        </ul>
+        <h2>Search</h2>
+        <form action="" method="POST">
+            <label for="family">Family: </label>
+            <select name="family">
+                <option value="" hidden>- Select -</option>
+                <option value="brass">Brass</option>
+                <option value="wood">Wood</option>
+                <option value="strings">Strings</option>
+                <option value="percussion">Percussion</option>
+            </select>
+            <label for="brand">Brand: </label>
+            <input type="text" name="brand" id="brand" placeholder="Enter brand">
 
-        <h2>Marcas</h2>
-        <ul>
-            <li><a href="#">Fender</a></li>
-            <li><a href="#">Gibson</a></li>
-            <li><a href="#">Yamaha</a></li>
-            <li><a href="#">Ibanez</a></li>
-        </ul>
+            <label for="model">Model: </label>
+            <input type="text" name="model" id="model" placeholder="Enter model">
+
+            <label for="serial_number">Serial Number: </label>
+            <input type="text" name="serial_number" id="serial_number" placeholder="Enter serial number">
+
+            <div class="status-checkboxes">
+                <label for="status">Status:</label>
+                <input type="checkbox" name="status[]" id="available" value="available">
+                <label for="available">Available</label>
+
+                <input type="checkbox" name="status[]" id="lent" value="lent">
+                <label for="lent">Lent</label>
+            </div>
+
+            <button type="submit" name="search_by">Search</button>
+        </form>
     </aside>
+
+
+
 
     <main>
         <div class="container">
             <?php
             foreach ($array as $row) {
-
                 ?>
                 <div class="instrument">
 
-
+                    <button class="delete-button" onclick="showConfirmation('<?php echo $row['id']; ?>')">X</button>
                     <h3>
-                        <?php echo $row["brand"]; ?>
-                        <?php echo $row["model"]; ?>
+                        <?php
+                        echo $row["brand"] . ' ' . $row["model"] . ' - ';
+                        $statusColor = ($row["state"] == 'available') ? 'available' : 'lent';
+                        echo '<span class="instrument-status ' . $statusColor . '">' . $row["state"] . '</span>';
+                        ?>
                     </h3>
                     <img src='.<?php echo $row["image"]; ?>'>
-                    <form action="POST">
-                        <button class="showMore" type="sumbit">+info</button>
+                    <form action="instrument_info.php" method="post">
+                        <input type="hidden" name="instrument_id" value="<?php echo $row["id"]; ?>">
+                        <button class="showMore" type="submit">+info</button>
                     </form>
                 </div>
-
-
                 <?php
-
-
-
             }
             ?>
         </div>
     </main>
 
-
-
     <footer>
         <p>Información personal - Nombre, dirección, contacto, etc.</p>
     </footer>
+
+    <script>
+        function showConfirmation(instrumentId) {
+            var confirmDelete = confirm("¿Estás seguro de que quieres eliminar este instrumento?");
+            if (confirmDelete) {
+                window.location.href = "deleteInstrument.php?instrumentId=" + instrumentId;
+                alert("Instrumento eliminado");
+            } else {
+
+                alert("Eliminación cancelada");
+            }
+        }
+    </script>
 </body>
 
 </html>

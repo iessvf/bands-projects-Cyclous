@@ -37,38 +37,30 @@ session_start();
 
 if (isset($_SESSION['id'])) {
     $id = $_SESSION['id'];
-    echo "esta es la id =" . $id;
+
 }
 if (isset($_POST["register_newInstrument"])) {
 
-    var_dump($_FILES);
+
 
     if (!empty($_POST["family"]) && !empty($_POST["type"]) && !empty($_POST["brand"]) && !empty($_POST["model"]) && !empty($_POST["serial_number"]) && !empty($_POST["acquisition_date"]) && !empty($_POST["state"]) && !empty($_POST["comment"]) && !empty($_FILES["image"]["tmp_name"])) {
 
 
         $family = $_POST["family"];
-        echo $family;
         $type = $_POST["type"];
-        echo $type;
         $brand = $_POST["brand"];
-        echo $brand;
         $model = $_POST["model"];
-        echo $model;
         $serial_number = $_POST["serial_number"];
-        echo $serial_number;
         $acquisition_date = $_POST["acquisition_date"];
-        echo $acquisition_date;
         $state = $_POST["state"];
-        echo $state;
         $comment = $_POST["comment"];
-        echo $comment;
 
 
         //Imagen
         $img_name = $_FILES['image']['name'];
         move_uploaded_file($_FILES['image']['tmp_name'], "./uploads/instruments/{$img_name}");
         $image = "/uploads/instruments/{$img_name}";
-        echo $image;
+
 
 
         $user = 'root';
@@ -95,6 +87,8 @@ if (isset($_POST["register_newInstrument"])) {
             $statement->bindParam(':id', $id);
             $statement->execute();
 
+
+            header('Location:main_webpage.php');
         } catch (PDOException $e) {
 
             $mensajeError = $e->getMessage();
