@@ -1,54 +1,63 @@
 <?php
 session_start();
-
-
 // Load Composer's autoloader
 require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+$message = '';
+
 if (isset($_POST['confirm']) && isset($_POST['email'])) {
-
-
     $email = $_POST['email'];
 
+    $user = 'root';
+    $dbpassword = '';
+    $dsn = 'mysql:dbname=bands;host=localhost';
+    $array = array();
 
+    $dbconn = new PDO($dsn, $user, $dbpassword);
 
+    // Construir la consulta base
+    $query = "SELECT password FROM bands WHERE mail = :mail ";
 
-
-
-
-
-
-
-
-
-
+    $statement = $dbconn->prepare($query);
+    $statement->bindParam(':mail', $email);
+    $statement->execute();
+    $array = $statement->fetchAll(PDO::FETCH_ASSOC);
 
     // Create an instance; passing `true` enables exceptions
     $mail = new PHPMailer(true);
 
     try {
-
-        // Recipients
+        $mail->isSMTP(); //Send using SMTP
+        $mail->Host = 'smtp.office365.com'; //Set the SMTP server to send through
+        $mail->SMTPAuth = true; //Enable SMTP authentication
+        $mail->Username = 'paucalcas@alu.edu.gva.es'; //SMTP username
+        $mail->Password = 'cyclous123A'; //SMTP password
+        $mail->SMTPSecure = "STARTTLS"; //Enable implicit TLS encryption
+        $mail->Port = 587; //TCP port to connect to; use 587 if you have set SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS
         $mail->setFrom('paucalcas@alu.edu.gva.es', 'Admin');
+        $mail->addAddress($email, 'User'); //Add a recipient
+
+        // Fetch the password from the array
+        $retrievedPassword = $array[0]['password'];
+
         $mail->addAddress($email);
 
-        // Content
-        $mail->isHTML(false);
-        $mail->Subject = 'Password recovery.';
-        $mail->Body = 'This is your password: ';
+        //Content
+        $mail->isHTML(true); //Set email format to HTML
+        $mail->Subject = 'Password recovery';
+        $mail->Body = 'Hello this is your password: ' . $retrievedPassword;
+
+        // Send the email
         $mail->send();
 
-        echo 'Message has been sent';
+        $message = 'Message has been sent';
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        $message = "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
-
-
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -61,7 +70,7 @@ if (isset($_POST['confirm']) && isset($_POST['email'])) {
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
-            background-image: url('../IMG/545752.jpg');
+            background-image: url('./IMG/545752.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             margin: 0;
@@ -138,14 +147,15 @@ if (isset($_POST['confirm']) && isset($_POST['email'])) {
         <form method="post" action="">
             <h2>Iniciar Sesión</h2>
 
-            <?php include("checkLogin.php") ?>
-
             <label for="email"><b>Correo Electrónico</b></label>
             <input type="email" id="email" name="email" required>
 
             <button type="submit" name="confirm">Confirm</button>
+            <p>
+                <?php echo $message; ?>
+            </p>
+            <a href="index.php">Volver atrás</a>
         </form>
-
     </div>
 </body>
 

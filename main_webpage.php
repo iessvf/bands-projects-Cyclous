@@ -103,7 +103,7 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
     }
 } else {
     // Si la sesión no contiene 'username', redirige de nuevo a la página de inicio de sesión
-    header("Location: login.php");
+    header("Location: index.php");
     exit();
 }
 ?>
@@ -160,14 +160,6 @@ if (isset($_SESSION['username']) && isset($_SESSION['id'])) {
             <label for="serial_number">Serial Number: </label>
             <input type="text" name="serial_number" id="serial_number" placeholder="Enter serial number">
 
-            <div class="status-checkboxes">
-                <label for="status">Status:</label>
-                <input type="checkbox" name="status[]" id="available" value="available">
-                <label for="available">Available</label>
-
-                <input type="checkbox" name="status[]" id="lent" value="lent">
-                <label for="lent">Lent</label>
-            </div>
 
             <button type="submit" name="search_by">Search</button>
         </form>

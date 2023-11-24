@@ -126,7 +126,7 @@ if (isset($_POST['register'])) {
             <input type="email" class="form-control" name="email" placeholder="Write...">
             <input type="file" class="form-control btn-upload" name="logo" accept=".jpg, .jpeg, .png">
             <button type="submit" name="register" class="btn">Register</button>
-            <div class="login_link"><a href="login.php">Go back to log in</a></div>
+            <div class="login_link"><a href="index.php">Go back to log in</a></div>
 
 
         </form>
